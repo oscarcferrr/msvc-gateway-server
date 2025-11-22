@@ -1,0 +1,62 @@
+resilience4j:
+  circuitbreaker:
+    configs: 
+      defecto:
+        sliding-window-size: 6
+        failure-rate-threshold: 50
+        wait-duration-in-open-state: 20s
+        permitted-number-of-calls-in-half-open-state: 4
+        slow-call-rate-threshold: 50
+        slow-call-duration-threshold: 3s
+    instances:
+      products:
+        base-config: defecto
+  timelimiter:
+    configs:
+      defecto:
+        timeout-duration: 3s
+    instances:
+      products:
+        base-config: defecto 
+
+      
+
+spring:
+  application:
+    name: msvc-gateway-server
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: msvc-products
+              uri: lb://msvc-products
+              predicates:
+                - Path=/api/products/**
+                # - Header=token, \d+
+                # - Method=GET, POST
+                # - Query=color
+                # - Cookie=color, azul
+                # - Header=Content-Type, application/json
+              filters:
+              - name: CircuitBreaker
+                args: 
+                  name: products
+                  statusCodes: 500
+                  fallbackUri: forward:/api/items/5
+              - EjemploCookie=Hola mi mensaje personalido para products!, user, Fer
+             #- name: EjemploCookie
+             #  args:
+             #     message : Hola mi mensaje personalido para products!
+             #     name: user
+             #     value: Oscar     
+            - id: msvc-items
+              uri: lb://msvc-items
+              predicates:
+                - Path=/api/items/**
+              filters:
+                - StripPrefix=2
+                - AddRequestHeader=token-request, sjdklkf
+                - AddResponseHeader=token-response, 234340823
+                - AddRequestParameter=name, Fernando
+                - SetResponseHeader=Content-Type, text/plain
