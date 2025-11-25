@@ -59,4 +59,4 @@ spring:
                 - AddRequestHeader=token-request, sjdklkf
                 - AddResponseHeader=token-response, 234340823
                 - AddRequestParameter=name, Fernando
-                - SetResponseHeader=Content-Type, text/plain
+                #- SetResponseHeader=Content-Type, text/plain
